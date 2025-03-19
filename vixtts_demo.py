@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, r"F:\viXTTS\TTS")  # Thêm đúng đường dẫn chứa 'TTS.tts'
+
 # This demo is adopted from https://github.com/coqui-ai/TTS/blob/dev/TTS/demos/xtts_ft_demo/xtts_demo.py
 # With some modifications to fit the viXTTS model
 import argparse
