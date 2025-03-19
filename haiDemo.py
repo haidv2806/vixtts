@@ -1,3 +1,8 @@
+import sys
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
 # The inference code is adopted from https://github.com/coqui-ai/TTS/blob/dev/TTS/demos/xtts_ft_demo/xtts_demo.py
 # @title 2. 🤗 **Sử dụng**
 # @markdown 👈 Nhấn để chạy.
@@ -26,8 +31,7 @@ def cry_and_quit():
     print("> Lỗi rồi huhu 😭😭, bạn hãy nhấn chạy lại phần này nhé!")
     quit()
 
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
+
 
 
 import os
@@ -43,11 +47,13 @@ from underthesea import sent_tokenize
 from unidecode import unidecode
 
 try:
-    from vinorm import TTSnorm
+    from underthesea import text_normalize
     from TTS.tts.configs.xtts_config import XttsConfig
     from TTS.tts.models.xtts import Xtts
-except:
+except Exception as e:
+    print(f"Lỗi khi tải mô hình: {e}")
     cry_and_quit()
+
 
 # Load model
 def clear_gpu_cache():
@@ -66,7 +72,7 @@ def load_model(xtts_checkpoint, xtts_config, xtts_vocab):
     XTTS_MODEL.load_checkpoint(config,
                                checkpoint_path=xtts_checkpoint,
                                vocab_path=xtts_vocab,
-                               use_deepspeed=True)
+                               use_deepspeed=False)
     if torch.cuda.is_available():
         XTTS_MODEL.cuda()
 
@@ -106,7 +112,7 @@ def calculate_keep_len(text, lang):
 
 def normalize_vietnamese_text(text):
     text = (
-        TTSnorm(text, unknown=False, lower=False, rule=True)
+        text_normalize(text)  # Dùng underthesea thay cho TTSnorm
         .replace("..", ".")
         .replace("!.", "!")
         .replace("?.", "?")
@@ -157,8 +163,10 @@ def run_tts(XTTS_MODEL, lang, tts_text, speaker_audio_file,
         # Bug on google colab
         try:
             tts_text = normalize_vietnamese_text(tts_text)
-        except:
+        except Exception as e:
+            print(f"Lỗi khi tải mô hình: {e}")
             cry_and_quit()
+
 
     if lang in ["ja", "zh-cn"]:
         tts_texts = tts_text.split("。")

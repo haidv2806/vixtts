@@ -411,4 +411,5 @@ if __name__ == "__main__":
             outputs=[progress_gen, tts_output_audio],
         )
 
-    demo.launch(share=True, debug=False, server_port=args.port, server_name="0.0.0.0")
+    demo.launch(share=True, debug=False, server_port=args.port, server_name="0.0.0.0", enable_queue=True)
+
